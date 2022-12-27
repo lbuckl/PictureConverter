@@ -8,7 +8,6 @@ import com.vados.pictureconverter.ui.PicturesFragment
  * Класс для объявления экранов в презентёре
  */
 object AndroidScreens : IScreens {
-    //Выполняет прикрепление фрагмента UsersFragment
-    override fun pictures(): Screen = FragmentScreen { PicturesFragment.newInstance() }
-
+    //Выполняет прикрепление фрагмента PicturesFragment
+    override fun pictures() = FragmentScreen { PicturesFragment.newInstance() }
 }
