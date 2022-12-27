@@ -1,11 +1,34 @@
 package com.vados.pictureconverter
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.github.terrakok.cicerone.androidx.AppNavigator
+import com.vados.pictureconverter.databinding.ActivityMainBinding
+import moxy.MvpAppCompatActivity
+import moxy.ktx.moxyPresenter
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : MvpAppCompatActivity(),MainView {
+    private var binding: ActivityMainBinding? = null
+    private val navigator = AppNavigator(this, R.id.container)
+
+    private val presenter by moxyPresenter {
+        MainPresenter(App.instance.router)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding?.root)
+    }
+
+    override fun onResumeFragments() {
+        super.onResumeFragments()
+        //Инициализируем навигатор
+        App.instance.navigatorHolder.setNavigator(navigator)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        //Удаляем навигатор
+        App.instance.navigatorHolder.removeNavigator()
     }
 }
