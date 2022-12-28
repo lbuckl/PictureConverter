@@ -7,7 +7,12 @@ import com.vados.pictureconverter.ui.BackButtonListener
 import moxy.MvpAppCompatActivity
 import moxy.ktx.moxyPresenter
 
+/**
+ * Основное активити:
+ * Отправляет задачу презентёру [presenter]
+ */
 class MainActivity : MvpAppCompatActivity(),MainView {
+
     private var binding: ActivityMainBinding? = null
     private val navigator = AppNavigator(this, R.id.container)
 

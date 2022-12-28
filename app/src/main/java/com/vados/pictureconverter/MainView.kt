@@ -10,5 +10,4 @@ import moxy.viewstate.strategy.StateStrategyType
  * Если команда такого типа уже есть в очереди, то действующая удалится
  */
 @StateStrategyType(AddToEndSingleStrategy::class)
-interface MainView: MvpView {
-}
+interface MainView: MvpView

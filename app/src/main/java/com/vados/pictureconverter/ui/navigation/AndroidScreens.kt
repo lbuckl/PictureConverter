@@ -1,6 +1,5 @@
 package com.vados.pictureconverter.ui.navigation
 
-import com.github.terrakok.cicerone.Screen
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.vados.pictureconverter.ui.PicturesFragment
 

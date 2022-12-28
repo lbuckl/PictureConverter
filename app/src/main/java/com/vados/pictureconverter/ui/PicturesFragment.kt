@@ -1,6 +1,5 @@
 package com.vados.pictureconverter.ui
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -33,10 +32,10 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentPicturesBinding.inflate(inflater,container,false)
         Log.v("@@@", "PicturesFragment")
-        return super.onCreateView(inflater, container, savedInstanceState)
+        return binding.root//super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun init() {
