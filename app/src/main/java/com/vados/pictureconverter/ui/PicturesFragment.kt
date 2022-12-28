@@ -35,7 +35,7 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
     ): View {
         _binding = FragmentPicturesBinding.inflate(inflater,container,false)
         Log.v("@@@", "PicturesFragment")
-        return binding.root//super.onCreateView(inflater, container, savedInstanceState)
+        return binding.root
     }
 
     override fun init() {
