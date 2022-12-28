@@ -10,6 +10,10 @@ class PicturesPresenter(private val router: Router): MvpPresenter<PicturesView>(
         viewState.init()
     }
 
+    fun downloadImageFromStorage(){
+
+    }
+
     fun backPressed(): Boolean {
         router.exit()
         return true

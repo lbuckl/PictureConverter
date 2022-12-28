@@ -1,5 +1,6 @@
 package com.vados.pictureconverter.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,6 +12,7 @@ import com.vados.pictureconverter.presenters.PicturesPresenter
 import com.vados.pictureconverter.presenters.PicturesView
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
+import okhttp3.MediaType.Companion.toMediaType
 
 class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener {
 
@@ -38,6 +40,24 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.buttonChoose.setOnClickListener{
+            //Вызываем стандартную галерею для выбора изображения с помощью Intent.ACTION_PICK:
+            val intent = Intent(Intent.ACTION_PICK)
+            //Тип получаемых объектов - image:
+            intent.type = "image/*"
+            //Запускаем переход с ожиданием обратного результата в виде информации об изображении:
+            startActivityForResult(intent,it.id)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        Log.v("@@@","onActivityResult")
+    }
+
     override fun init() {
         //TODO("Not yet implemented")
     }
@@ -45,6 +65,8 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
     override fun updateList() {
         //TODO("Not yet implemented")
     }
+
+
 
     override fun onDestroy() {
         _binding = null
