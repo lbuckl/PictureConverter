@@ -10,15 +10,20 @@ import android.view.ViewGroup
 import coil.load
 import com.vados.pictureconverter.App
 import com.vados.pictureconverter.databinding.FragmentPicturesBinding
+import com.vados.pictureconverter.model.JpgToPngConverter
 import com.vados.pictureconverter.presenters.PicturesPresenter
 import com.vados.pictureconverter.presenters.PicturesView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
-import okhttp3.MediaType.Companion.toMediaType
 
 class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener {
 
     private val photoID = 1
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     companion object {
         fun newInstance() = PicturesFragment()
@@ -46,12 +51,21 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        //Загружаем .jpg изображение из галереи
+        initButtonChoose()
+        //Конвертируем в .png и сохраняем
+        initButtonConvert()
+    }
 
+    /**
+     * Кнопка реализующая функицю чтения фото из памяти смартфона
+     */
+    private fun initButtonChoose(){
         binding.buttonChoose.setOnClickListener{
             //Вызываем стандартную галерею для выбора изображения с помощью Intent.ACTION_PICK:
             val intent = Intent(Intent.ACTION_PICK)
             //Тип получаемых объектов - image:
-            intent.type = "image/*"
+            intent.type = "image/*.jpg"
             //Запускаем переход с ожиданием обратного результата в виде информации об изображении:
             startActivityForResult(intent,photoID)
         }
@@ -68,6 +82,19 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
         }
     }
 
+    /**
+     * Кнопка реализующая функицю конвертирования из .jpg в .png
+     * и загрузку изображения в память смартфона
+     */
+    private fun initButtonConvert(){
+        binding.buttonConvert.setOnClickListener {
+            coroutineScope.launch {
+                Log.v("@@@","Начал сохранение")
+                JpgToPngConverter.savePicture(requireContext(),binding.imageView.drawable)
+            }
+        }
+    }
+
     override fun init() {
         //TODO("Not yet implemented")
     }
@@ -80,6 +107,7 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
 
     override fun onDestroy() {
         _binding = null
+        coroutineScope.cancel()
         super.onDestroy()
     }
 
