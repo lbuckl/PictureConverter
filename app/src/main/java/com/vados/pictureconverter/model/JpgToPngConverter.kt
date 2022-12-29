@@ -26,13 +26,12 @@ import kotlin.coroutines.suspendCoroutine
 object JpgToPngConverter {
 
     //функция сохраняет картинку формата drawable в память смартфона
-    suspend fun savePicture(fileDir:String, contentResolver: ContentResolver, draw: Drawable) = suspendCoroutine{
+    suspend fun savePicture(folderToSave:String,
+                            contentResolver: ContentResolver,
+                            draw: Drawable, fileName: String
+    ) = suspendCoroutine{
         //переменные для создания пути сохранения файла в память сматрфона
-        val fileName = "NewPicture2" //имя файла
-        val folderToSave = fileDir//директория для сохранения
-        Log.v("@@@","директория для сохранения: $folderToSave ")
         val file = File(folderToSave,fileName)
-
 
         if (file.isFile){
             it.resume("Файл уже загружен")
@@ -45,8 +44,8 @@ object JpgToPngConverter {
                     //Открывает поток
                     fOut = FileOutputStream(file)
 
-                    //преобразуем в битмап и сохраняем в формате jpeg с 50% сжатием
-                    draw.toBitmap().compress(Bitmap.CompressFormat.PNG,50,fOut)
+                    //преобразуем в битмап и сохраняем в формате png с 50% сжатием
+                    draw.toBitmap().compress(Bitmap.CompressFormat.PNG, 50,fOut)
 
                     //закрываем поток
                     fOut.flush()

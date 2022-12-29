@@ -23,6 +23,7 @@ import moxy.ktx.moxyPresenter
 class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener {
 
     private val photoID = 1
+    private var fileName = ""
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     companion object {
@@ -45,7 +46,6 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPicturesBinding.inflate(inflater,container,false)
-        Log.v("@@@", "PicturesFragment")
         return binding.root
     }
 
@@ -74,11 +74,15 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
         if (resultCode == RESULT_OK){
-            Log.v("@@@","RESULT_OK")
-            val image = data?.data
-            binding.imageView.load(image)
+            try {
+                val image = data?.data.let {
+                    fileName = it.toString().split("/").last()
+                }
+                binding.imageView.load(image)
+            }catch (e:RuntimeException){
+                e.printStackTrace()
+            }
         }
     }
 
@@ -92,7 +96,9 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
                 Log.v("@@@","Начал сохранение")
                 JpgToPngConverter.savePicture(requireContext().filesDir.toString(),
                     requireContext().contentResolver,
-                    binding.imageView.drawable)
+                    binding.imageView.drawable,
+                    fileName
+                )
             }
         }
     }
