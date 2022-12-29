@@ -1,11 +1,13 @@
 package com.vados.pictureconverter.ui
 
+import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import coil.load
 import com.vados.pictureconverter.App
 import com.vados.pictureconverter.databinding.FragmentPicturesBinding
 import com.vados.pictureconverter.presenters.PicturesPresenter
@@ -15,6 +17,8 @@ import moxy.ktx.moxyPresenter
 import okhttp3.MediaType.Companion.toMediaType
 
 class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener {
+
+    private val photoID = 1
 
     companion object {
         fun newInstance() = PicturesFragment()
@@ -49,13 +53,19 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
             //Тип получаемых объектов - image:
             intent.type = "image/*"
             //Запускаем переход с ожиданием обратного результата в виде информации об изображении:
-            startActivityForResult(intent,it.id)
+            startActivityForResult(intent,photoID)
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Log.v("@@@","onActivityResult")
+
+        if (resultCode == RESULT_OK){
+            Log.v("@@@","RESULT_OK")
+            val image = data?.data
+            binding.imageView.load(image)
+        }
     }
 
     override fun init() {
