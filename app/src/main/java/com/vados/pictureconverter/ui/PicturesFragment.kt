@@ -90,7 +90,9 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
         binding.buttonConvert.setOnClickListener {
             coroutineScope.launch {
                 Log.v("@@@","Начал сохранение")
-                JpgToPngConverter.savePicture(requireContext(),binding.imageView.drawable)
+                JpgToPngConverter.savePicture(requireContext().filesDir.toString(),
+                    requireContext().contentResolver,
+                    binding.imageView.drawable)
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.vados.pictureconverter.model
 
+import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
@@ -25,10 +26,10 @@ import kotlin.coroutines.suspendCoroutine
 object JpgToPngConverter {
 
     //функция сохраняет картинку формата drawable в память смартфона
-    suspend fun savePicture(context: Context, draw: Drawable) = suspendCoroutine{
+    suspend fun savePicture(fileDir:String, contentResolver: ContentResolver, draw: Drawable) = suspendCoroutine{
         //переменные для создания пути сохранения файла в память сматрфона
-        val fileName = "NewPicture" //имя файла
-        val folderToSave = context.filesDir.toString()//директория для сохранения
+        val fileName = "NewPicture2" //имя файла
+        val folderToSave = fileDir//директория для сохранения
         Log.v("@@@","директория для сохранения: $folderToSave ")
         val file = File(folderToSave,fileName)
 
@@ -52,7 +53,7 @@ object JpgToPngConverter {
                     fOut.close()
 
                     // регистрация в фотоальбоме
-                    MediaStore.Images.Media.insertImage(context.contentResolver,
+                    MediaStore.Images.Media.insertImage(contentResolver,
                         file.absolutePath,file.name,file.name)
                     if (file.isFile) it.resume("Файл удачно загружен")
                 }catch (e: IOException){
@@ -63,11 +64,11 @@ object JpgToPngConverter {
                     it.resume("Файл не загружен!!!")
                     Log.v("@@@","NullPointerException")
                     e.printStackTrace()
-                }/*catch (e:IllegalArgumentException){
+                }catch (e:IllegalArgumentException){
                     it.resume("Файл не загружен!!!")
                     Log.v("@@@","IllegalArgumentException")
                     e.printStackTrace()
-                }*/
+                }
             }
         }
     }
