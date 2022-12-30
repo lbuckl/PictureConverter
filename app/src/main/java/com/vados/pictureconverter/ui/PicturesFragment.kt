@@ -119,8 +119,7 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
                 //binding.imageView.drawable.toBitmap().saveAsPNG(fileName)
                 val imageBitMap = binding.imageView.drawable.toBitmap()
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) saveImageInQ(imageBitMap)
-                else
-                    legacySave(imageBitMap)
+                else legacySave(imageBitMap)
             }
         }
     }
@@ -128,12 +127,12 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
     //Make sure to call this function on a worker thread, else it will block main thread
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun saveImageInQ(bitmap: Bitmap): Uri {
-        val filename = "IMG_${System.currentTimeMillis()}.jpg"
+        val filename = "$fileName.png"
         var fos: OutputStream? = null
         var imageUri: Uri? = null
         val contentValues = ContentValues().apply {
             put(DISPLAY_NAME, filename)
-            put(MIME_TYPE, "image/jpg")
+            put(MIME_TYPE, "image/png")
             put(RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
             put(MediaStore.Video.Media.IS_PENDING, 1)
         }
@@ -146,7 +145,7 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
             fos = imageUri?.let { resolver.openOutputStream(it) }
         }
 
-        fos?.use { bitmap.compress(Bitmap.CompressFormat.JPEG, 70, it) }
+        fos?.use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
 
         contentValues.clear()
         contentValues.put(MediaStore.Video.Media.IS_PENDING, 0)
