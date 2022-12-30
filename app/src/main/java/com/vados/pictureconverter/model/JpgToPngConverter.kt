@@ -1,10 +1,14 @@
 package com.vados.pictureconverter.model
 
 import android.content.ContentResolver
+import android.content.ContentValues
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder.ImageInfo
 import android.graphics.ImageFormat
 import android.graphics.drawable.Drawable
+import android.os.Build
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES.Q
 import android.provider.MediaStore
 import android.util.Log
 import androidx.core.graphics.drawable.toBitmap
@@ -27,7 +31,7 @@ object JpgToPngConverter {
                             draw: Drawable, fileName: String
     ) = suspendCoroutine{
         //переменные для создания пути сохранения файла в память сматрфона
-        val file = File(folderToSave, "$fileName")
+        val file = File(folderToSave, fileName)
 
         if (file.isFile){
             it.resume("Файл уже загружен")
@@ -47,10 +51,20 @@ object JpgToPngConverter {
                     fOut.flush()
                     fOut.close()
 
-                    // регистрация в фотоальбоме
-                    MediaStore.Images.Media.insertImage(contentResolver,
-                        bitmap, fileName, fileName
-                    )
+                    ContentValues().apply {
+                        Log.v("@@@","new")
+                        put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                        put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
+                        if (SDK_INT >= Q) { //this one
+                            put(MediaStore.MediaColumns.RELATIVE_PATH, file.path)
+                            put(MediaStore.MediaColumns.IS_PENDING, 1)
+                        }
+                        // регистрация в фотоальбоме
+                        MediaStore.Images.Media.insertImage(contentResolver,
+                            bitmap, fileName, fileName
+                        )
+
+                    }
                     if (file.isFile) it.resume("Файл удачно загружен")
                 }catch (e: IOException){
                     it.resume("Файл не загружен!!!")

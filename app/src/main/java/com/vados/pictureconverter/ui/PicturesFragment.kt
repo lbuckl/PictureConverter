@@ -1,12 +1,26 @@
 package com.vados.pictureconverter.ui
 
 import android.app.Activity.RESULT_OK
+import android.content.ContentValues
 import android.content.Intent
+import android.graphics.Bitmap
+import android.media.MediaScannerConnection
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.os.Environment.DIRECTORY_PICTURES
+import android.os.Environment.getExternalStoragePublicDirectory
+import android.provider.MediaStore
+import android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+import android.provider.MediaStore.MediaColumns.*
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
+import androidx.core.content.FileProvider
+import androidx.core.graphics.drawable.toBitmap
 import coil.load
 import com.vados.pictureconverter.App
 import com.vados.pictureconverter.databinding.FragmentPicturesBinding
@@ -19,6 +33,9 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
 
 class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener {
 
@@ -65,7 +82,7 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
             //Вызываем стандартную галерею для выбора изображения с помощью Intent.ACTION_PICK:
             val intent = Intent(Intent.ACTION_PICK)
             //Тип получаемых объектов - image:
-            intent.type = "image/*.jpg"
+            intent.type = "image/png"
             //Запускаем переход с ожиданием обратного результата в виде информации об изображении:
             startActivityForResult(intent,photoID)
         }
@@ -79,6 +96,7 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
                 val image = data?.data
                 fileName = image.toString().split("/").last()
                 binding.imageView.load(image)
+
             }catch (e:RuntimeException){
                 e.printStackTrace()
             }
@@ -93,13 +111,62 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
         binding.buttonConvert.setOnClickListener {
             coroutineScope.launch {
                 Log.v("@@@","Начал сохранение")
-                JpgToPngConverter.savePicture(requireContext().filesDir.toString(),
+                /*JpgToPngConverter.savePicture(requireContext().filesDir.toString(),
                     requireContext().contentResolver,
                     binding.imageView.drawable,
                     fileName
-                )
+                )*/
+                //binding.imageView.drawable.toBitmap().saveAsPNG(fileName)
+                val imageBitMap = binding.imageView.drawable.toBitmap()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) saveImageInQ(imageBitMap)
+                else
+                    legacySave(imageBitMap)
             }
         }
+    }
+
+    //Make sure to call this function on a worker thread, else it will block main thread
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun saveImageInQ(bitmap: Bitmap): Uri {
+        val filename = "IMG_${System.currentTimeMillis()}.jpg"
+        var fos: OutputStream? = null
+        var imageUri: Uri? = null
+        val contentValues = ContentValues().apply {
+            put(DISPLAY_NAME, filename)
+            put(MIME_TYPE, "image/jpg")
+            put(RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+            put(MediaStore.Video.Media.IS_PENDING, 1)
+        }
+
+        //use application context to get contentResolver
+        val contentResolver = requireActivity().contentResolver
+
+        contentResolver.also { resolver ->
+            imageUri = resolver.insert(EXTERNAL_CONTENT_URI, contentValues)
+            fos = imageUri?.let { resolver.openOutputStream(it) }
+        }
+
+        fos?.use { bitmap.compress(Bitmap.CompressFormat.JPEG, 70, it) }
+
+        contentValues.clear()
+        contentValues.put(MediaStore.Video.Media.IS_PENDING, 0)
+        contentResolver.update(imageUri!!, contentValues, null, null)
+
+        return imageUri!!
+    }
+
+    //Make sure to call this function on a worker thread, else it will block main thread
+    private fun legacySave(bitmap: Bitmap): Uri {
+        val directory = getExternalStoragePublicDirectory(DIRECTORY_PICTURES)
+        val file = File(directory, "$fileName.png")
+        val outStream = FileOutputStream(file)
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream)
+        outStream.flush()
+        outStream.close()
+        MediaScannerConnection.scanFile(requireContext(), arrayOf(file.absolutePath),
+            null, null)
+        return FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.provider",
+            file)
     }
 
     override fun init() {
@@ -119,4 +186,7 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
     }
 
     override fun backPressed() = presenter.backPressed()
+
+
+
 }
