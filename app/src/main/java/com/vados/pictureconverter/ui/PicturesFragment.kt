@@ -76,9 +76,8 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK){
             try {
-                val image = data?.data.let {
-                    fileName = it.toString().split("/").last()
-                }
+                val image = data?.data
+                fileName = image.toString().split("/").last()
                 binding.imageView.load(image)
             }catch (e:RuntimeException){
                 e.printStackTrace()
