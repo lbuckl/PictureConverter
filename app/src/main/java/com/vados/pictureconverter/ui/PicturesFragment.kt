@@ -24,7 +24,6 @@ import androidx.core.graphics.drawable.toBitmap
 import coil.load
 import com.vados.pictureconverter.App
 import com.vados.pictureconverter.databinding.FragmentPicturesBinding
-import com.vados.pictureconverter.model.JpgToPngConverter
 import com.vados.pictureconverter.presenters.PicturesPresenter
 import com.vados.pictureconverter.presenters.PicturesView
 import kotlinx.coroutines.CoroutineScope
@@ -111,12 +110,6 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
         binding.buttonConvert.setOnClickListener {
             coroutineScope.launch {
                 Log.v("@@@","Начал сохранение")
-                /*JpgToPngConverter.savePicture(requireContext().filesDir.toString(),
-                    requireContext().contentResolver,
-                    binding.imageView.drawable,
-                    fileName
-                )*/
-                //binding.imageView.drawable.toBitmap().saveAsPNG(fileName)
                 val imageBitMap = binding.imageView.drawable.toBitmap()
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) saveImageInQ(imageBitMap)
                 else legacySave(imageBitMap)
@@ -128,12 +121,12 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun saveImageInQ(bitmap: Bitmap): Uri {
         val filename = "$fileName.png"
-        var fos: OutputStream? = null
-        var imageUri: Uri? = null
+        var fos: OutputStream?
+        var imageUri: Uri?
         val contentValues = ContentValues().apply {
             put(DISPLAY_NAME, filename)
             put(MIME_TYPE, "image/png")
-            put(RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+            put(RELATIVE_PATH, DIRECTORY_PICTURES)
             put(MediaStore.Video.Media.IS_PENDING, 1)
         }
 
