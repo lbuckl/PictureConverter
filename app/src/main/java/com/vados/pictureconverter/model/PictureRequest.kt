@@ -4,9 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContract
-import androidx.activity.result.contract.ActivityResultContracts
-import coil.load
 
 class PictureRequest: ActivityResultContract<Int, Uri?>() {
 
@@ -15,11 +14,14 @@ class PictureRequest: ActivityResultContract<Int, Uri?>() {
         val intent = Intent(Intent.ACTION_PICK)
         //Тип получаемых объектов - image:
         intent.type = "image/png"
+        Log.v("@@@","createIntent")
         return intent
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
+        Log.v("@@@","parseResult")
         if (resultCode == Activity.RESULT_OK){
+            Log.v("@@@","RESULT_OK")
             return try {
                 val image = intent?.data
                 image

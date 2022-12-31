@@ -18,6 +18,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultCallback
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
@@ -42,9 +43,13 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
     private val photoID = 1
     private var fileName = ""
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
+
     private var launcher = registerForActivityResult(PictureRequest()){ uri ->
-        fileName = uri.toString().split("/").last()
-        binding.imageView.load(uri)
+        Log.v("@@@","Fragment")
+        uri?.let {
+            fileName = it.toString().split("/").last()
+            binding.imageView.load(it)
+        }
     }
 
     companion object {
@@ -83,31 +88,9 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
      */
     private fun initButtonChoose(){
         binding.buttonChoose.setOnClickListener{
-            //Вызываем стандартную галерею для выбора изображения с помощью Intent.ACTION_PICK:
-            val intent = Intent(Intent.ACTION_PICK)
-            //Тип получаемых объектов - image:
-            intent.type = "image/png"
-            //Запускаем переход с ожиданием обратного результата в виде информации об изображении:
-            //startActivityForResult(intent,photoID)
-
-            launcher.contract
+            launcher.launch(photoID)
         }
     }
-
-    /*@Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK){
-            try {
-                val image = data?.data
-                fileName = image.toString().split("/").last()
-                binding.imageView.load(image)
-
-            }catch (e:RuntimeException){
-                e.printStackTrace()
-            }
-        }
-    }*/
 
     /**
      * Кнопка реализующая функицю конвертирования из .jpg в .png
