@@ -10,8 +10,6 @@ class App: Application() {
         lateinit var instance: App
     }
 
-    fun getMyApp() = instance
-
     //Временно до даггера положим это тут
     private val cicerone: Cicerone<Router> by lazy {
         Cicerone.create()

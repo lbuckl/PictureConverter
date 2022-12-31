@@ -24,6 +24,7 @@ import androidx.core.graphics.drawable.toBitmap
 import coil.load
 import com.vados.pictureconverter.App
 import com.vados.pictureconverter.databinding.FragmentPicturesBinding
+import com.vados.pictureconverter.model.PictureRequest
 import com.vados.pictureconverter.presenters.PicturesPresenter
 import com.vados.pictureconverter.presenters.PicturesView
 import kotlinx.coroutines.CoroutineScope
@@ -41,6 +42,10 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
     private val photoID = 1
     private var fileName = ""
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
+    private var launcher = registerForActivityResult(PictureRequest()){ uri ->
+        fileName = uri.toString().split("/").last()
+        binding.imageView.load(uri)
+    }
 
     companion object {
         fun newInstance() = PicturesFragment()
@@ -83,11 +88,13 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
             //Тип получаемых объектов - image:
             intent.type = "image/png"
             //Запускаем переход с ожиданием обратного результата в виде информации об изображении:
-            startActivityForResult(intent,photoID)
+            //startActivityForResult(intent,photoID)
+
+            launcher.contract
         }
     }
 
-    @Deprecated("Deprecated in Java")
+    /*@Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK){
@@ -100,7 +107,7 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
                 e.printStackTrace()
             }
         }
-    }
+    }*/
 
     /**
      * Кнопка реализующая функицю конвертирования из .jpg в .png
