@@ -7,8 +7,17 @@ import android.net.Uri
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContract
 
+/**
+ * Класс реализующий выбор фото из Галереии смартфона
+ *
+ */
 class PictureRequest: ActivityResultContract<Int, Uri?>() {
 
+    /**
+     * Создание интента на просмотр фото в галерее
+     * @param context - передаётся автоматически по умолчанию из активити или фрагмента
+     * @param input - произволный айди для интента
+     */
     override fun createIntent(context: Context, input: Int): Intent {
         Log.v("@@@",Thread.currentThread().name)
         //Вызываем стандартную галерею для выбора изображения с помощью Intent.ACTION_PICK:
@@ -18,6 +27,10 @@ class PictureRequest: ActivityResultContract<Int, Uri?>() {
         return intent
     }
 
+    /**
+     * Результат выполнения интента
+     * возвращает uri фото в галерее или null
+     */
     override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
         Log.v("@@@",Thread.currentThread().name)
         if (resultCode == Activity.RESULT_OK){

@@ -25,18 +25,28 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
 
+/**
+ * Презентёр для фрагмента отображения фото и управление конвертацией
+ * из jpg в png
+ */
 class PicturesPresenter(private val router: Router): MvpPresenter<PicturesView>() {
-
-
+    //переменные Disposable
     private  lateinit var disposableChooseImage: Disposable
     private  lateinit var disposableSaveImage: Disposable
+    //Имя файла фото из галереи
     private var fileName = ""
 
+    /**
+     * Первое действие при запуске приложения
+     */
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         viewState.init()
     }
 
+    /**
+     * Функция отображения фото по запрошенному uri
+     */
     fun showImage(uri: Uri?){
 
         disposableChooseImage = Completable.create{ emitter ->
@@ -59,6 +69,15 @@ class PicturesPresenter(private val router: Router): MvpPresenter<PicturesView>(
         )
     }
 
+    /**
+     * Функция для конвертирования изображения в формат png и
+     * выведения информационного сообщения пользователю о результатае конвертации:
+     * (выполнено/ошибка).
+     *
+     * В зависиомти от версии SDK есть 2 функции конвертирования:
+     * saveImageInQ - новый спобос при версии SDK больше 28
+     * legacySave - устаревший способ при версии 28 и ниже
+     */
     fun convertToPngAndSave(bitmapImage: Bitmap,contentResolver: ContentResolver){
         viewState.showProgress()
 
@@ -85,7 +104,10 @@ class PicturesPresenter(private val router: Router): MvpPresenter<PicturesView>(
         )
     }
 
-    //Make sure to call this function on a worker thread, else it will block main thread
+    /**
+     * Функция для конвертрования и сохранения изображения в формате png
+     * формат для версии Android Q
+     */
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun saveImageInQ(bitmap: Bitmap, contentResolver: ContentResolver):Boolean {
         val filename = "$fileName.png"
@@ -123,6 +145,10 @@ class PicturesPresenter(private val router: Router): MvpPresenter<PicturesView>(
         }
     }
 
+    /**
+     * Функция для конвертрования и сохранения изображения в формате png
+     * формат для версии Android ниже Q
+     */
     private fun legacySave(bitmap: Bitmap): Boolean {
         try {
             val directory =
@@ -153,6 +179,7 @@ class PicturesPresenter(private val router: Router): MvpPresenter<PicturesView>(
         }
     }
 
+    //Функция сохранения URI в getSharedPreferences
     private fun saveUri(uri: Uri?){
         val sharedPrefer =
             App.instance.getSharedPreferences(PREF_SAVE_IMAGE, Context.MODE_PRIVATE)
@@ -163,6 +190,7 @@ class PicturesPresenter(private val router: Router): MvpPresenter<PicturesView>(
         ).apply()
     }
 
+    //Дейтсиве при нажатии кнопки "Назад"
     fun backPressed(): Boolean {
         router.exit()
         return true

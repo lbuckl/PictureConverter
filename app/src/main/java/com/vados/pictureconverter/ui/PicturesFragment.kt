@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.Resources.NotFoundException
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,14 +25,20 @@ import com.vados.pictureconverter.utils.PREF_SAVE_IMAGE
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 
+/**
+ * Фрагмент для взаимодействия и выполнения операций
+ * пользователя с изображениями из Галереи
+ */
 class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener, ExecutePhoto {
 
-    private val photoID = 1
+    private val photoID = 1 // произвольный айди фото
 
+    //Презентёр для фрагмента
     private val presenter: PicturesPresenter by moxyPresenter {
         PicturesPresenter(App.instance.router)
     }
 
+    //Коллбэк от активити получающей фото из галереи
     override var launcher = registerForActivityResult(PictureRequest()){ uri ->
         uri?.let {
             presenter.showImage(uri)
@@ -87,13 +92,18 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener,
         }
     }
 
+    /**
+     * Функция инициализирующая состояние фаргмента при запуске или восстановлении фрагмента
+     */
     override fun init() {
+
+        // uri последнего изображения
         val uriString = requireContext()
             .getSharedPreferences(PREF_SAVE_IMAGE, Context.MODE_PRIVATE)
             .getString(IMAGE_FILE_NAME, ERROR_FILE_NAME)
         if (uriString != ERROR_FILE_NAME) displayImage(uriString!!.toUri())
         else {
-            try {
+            try { // берём дефолтное изображение, если не получилось из uri
                 binding.imageView.load(ResourcesCompat.getDrawable(
                     requireContext().resources,
                     R.drawable.picture_earth,
@@ -105,25 +115,40 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener,
         }
     }
 
+    /**
+     * Функция отображения информации об ошибке для пользователя
+     */
     override fun showError(message: String) {
         goneProgressBar()
         Toast.makeText(requireContext(),"Error: $message",Toast.LENGTH_SHORT).show()
     }
 
+    /**
+     * Функция отображения информационного сообщения для пользователя
+     */
     override fun showInfo(message: String) {
         goneProgressBar()
         Toast.makeText(requireContext(),message,Toast.LENGTH_LONG).show()
     }
 
+    /**
+     * Функция отображения изображения полученного из галереи
+     */
     override fun displayImage(uri: Uri?) {
         if (uri != null) binding.imageView.load(uri)
         else showError("Ошибка загрузки")
     }
 
+    /**
+     * Отображение прогрес бара при загрузке
+     */
     override fun showProgress() {
         binding.progressBar.visibility = View.VISIBLE
     }
 
+    /**
+     * Скрытие прогрес бара при окончании загрузки
+     */
     private fun goneProgressBar(){
         binding.progressBar.let {
             if (it.visibility != View.GONE) it.visibility = View.GONE
@@ -136,5 +161,8 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener,
         super.onDestroy()
     }
 
+    /**
+     * функция нажатия кнопки "Назад"
+     */
     override fun backPressed() = presenter.backPressed()
 }

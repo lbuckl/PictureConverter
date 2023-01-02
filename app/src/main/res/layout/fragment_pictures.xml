@@ -30,7 +30,8 @@
         android:id="@+id/button_choose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="choose"
+        android:layout_margin="@dimen/button_padding"
+        android:text="@string/choose"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -38,7 +39,8 @@
         android:id="@+id/button_convert"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="convert"
+        android:layout_margin="@dimen/button_padding"
+        android:text="@string/convert"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
