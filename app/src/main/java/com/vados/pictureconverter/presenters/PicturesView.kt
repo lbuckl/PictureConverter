@@ -15,8 +15,12 @@ import moxy.viewstate.strategy.StateStrategyType
 interface PicturesView:MvpView {
     //Функция инициализации фрагмента
     fun init()
-
+    //Функция отображения ошибки
     fun showError(message: String)
+    //Функция отображения иформационного сообщения
+    fun showInfo(message: String)
     //Функция отображения фото
     fun displayImage(uri: Uri?)
+    //Функция отображения прогресс бара
+    fun showProgress()
 }
