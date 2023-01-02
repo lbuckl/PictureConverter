@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment.DIRECTORY_PICTURES
 import android.os.Environment.getExternalStoragePublicDirectory
+import android.os.Message
 import android.provider.MediaStore
 import android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 import android.provider.MediaStore.MediaColumns.*
@@ -152,9 +153,17 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener,
         //TODO("Not yet implemented")
     }
 
+    override fun showError(message: String) {
+        Toast.makeText(requireContext(),message,Toast.LENGTH_SHORT).show()
+    }
+
+    /*override fun updateList() {
+        TODO("Not yet implemented")
+    }*/
+
     override fun displayImage(uri: Uri?) {
         if (uri != null) binding.imageView.load(uri)
-        else Toast.makeText(requireContext(),"Ошибка загрузки",Toast.LENGTH_SHORT).show()
+        else showError("Ошибка загрузки")
     }
 
 
