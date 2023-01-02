@@ -10,18 +10,17 @@ import androidx.activity.result.contract.ActivityResultContract
 class PictureRequest: ActivityResultContract<Int, Uri?>() {
 
     override fun createIntent(context: Context, input: Int): Intent {
+        Log.v("@@@",Thread.currentThread().name)
         //Вызываем стандартную галерею для выбора изображения с помощью Intent.ACTION_PICK:
         val intent = Intent(Intent.ACTION_PICK)
         //Тип получаемых объектов - image:
-        intent.type = "image/png"
-        Log.v("@@@","createIntent")
+        intent.type = "image/"
         return intent
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
-        Log.v("@@@","parseResult")
+        Log.v("@@@",Thread.currentThread().name)
         if (resultCode == Activity.RESULT_OK){
-            Log.v("@@@","RESULT_OK")
             return try {
                 val image = intent?.data
                 image

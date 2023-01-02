@@ -1,5 +1,7 @@
 package com.vados.pictureconverter.presenters
 
+import android.net.Uri
+import androidx.activity.result.ActivityResultLauncher
 import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.StateStrategyType
@@ -13,6 +15,6 @@ import moxy.viewstate.strategy.StateStrategyType
 interface PicturesView:MvpView {
     //Функция инициализации фрагмента
     fun init()
-    //Функция обновления данных фрагмента
-    fun updateList()
+    //Функция отображения фото
+    fun displayImage(uri: Uri?)
 }

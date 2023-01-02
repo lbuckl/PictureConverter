@@ -1,14 +1,11 @@
 package com.vados.pictureconverter.ui
 
-import android.app.Activity.RESULT_OK
 import android.content.ContentValues
-import android.content.Intent
 import android.graphics.Bitmap
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.os.Environment.DIRECTORY_PICTURES
 import android.os.Environment.getExternalStoragePublicDirectory
 import android.provider.MediaStore
@@ -18,13 +15,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.ActivityResultCallback
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
 import coil.load
 import com.vados.pictureconverter.App
 import com.vados.pictureconverter.databinding.FragmentPicturesBinding
+import com.vados.pictureconverter.model.ExecutePhoto
 import com.vados.pictureconverter.model.PictureRequest
 import com.vados.pictureconverter.presenters.PicturesPresenter
 import com.vados.pictureconverter.presenters.PicturesView
@@ -38,26 +36,25 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 
-class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener {
+class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener, ExecutePhoto {
 
-    private val photoID = 1
     private var fileName = ""
+    private val photoID = 1
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
-    private var launcher = registerForActivityResult(PictureRequest()){ uri ->
-        Log.v("@@@","Fragment")
+    private val presenter: PicturesPresenter by moxyPresenter {
+        PicturesPresenter(App.instance.router)
+    }
+
+    override var launcher = registerForActivityResult(PictureRequest()){ uri ->
         uri?.let {
             fileName = it.toString().split("/").last()
-            binding.imageView.load(it)
+            presenter.showImage(uri)
         }
     }
 
     companion object {
         fun newInstance() = PicturesFragment()
-    }
-
-    private val presenter: PicturesPresenter by moxyPresenter {
-        PicturesPresenter(App.instance.router)
     }
 
     private var _binding: FragmentPicturesBinding? = null
@@ -155,10 +152,10 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
         //TODO("Not yet implemented")
     }
 
-    override fun updateList() {
-        //TODO("Not yet implemented")
+    override fun displayImage(uri: Uri?) {
+        if (uri != null) binding.imageView.load(uri)
+        else Toast.makeText(requireContext(),"Ошибка загрузки",Toast.LENGTH_SHORT).show()
     }
-
 
 
     override fun onDestroy() {
@@ -168,7 +165,4 @@ class PicturesFragment: MvpAppCompatFragment(),PicturesView, BackButtonListener 
     }
 
     override fun backPressed() = presenter.backPressed()
-
-
-
 }
