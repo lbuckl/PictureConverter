@@ -2,31 +2,28 @@ package com.vados.pictureconverter.presenters
 
 import android.content.ContentResolver
 import android.content.ContentValues
+import android.content.Context
 import android.graphics.Bitmap
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import androidx.annotation.MainThread
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.FileProvider
 import com.github.terrakok.cicerone.Router
 import com.vados.pictureconverter.App
+import com.vados.pictureconverter.utils.IMAGE_FILE_NAME
+import com.vados.pictureconverter.utils.PREF_SAVE_IMAGE
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Dispatchers.Main
 import moxy.MvpPresenter
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
-import java.security.Provider
 
 class PicturesPresenter(private val router: Router): MvpPresenter<PicturesView>() {
 
@@ -40,14 +37,17 @@ class PicturesPresenter(private val router: Router): MvpPresenter<PicturesView>(
         viewState.init()
     }
 
-    fun showImage(uri: Uri?, fileNameFromRequest: String){
+    fun showImage(uri: Uri?){
+
         disposableChooseImage = Completable.create{ emitter ->
             try {
-                //TODO сохранение URI в БД
-                fileName = fileNameFromRequest
+                saveUri(uri)
+                fileName = uri.toString().split("/").last()
                 emitter.onComplete()
             }catch (e: IOException){
                 emitter.onError(Throwable("Trying get Image:Error"))
+            }catch (e: NullPointerException){
+                emitter.onError(Throwable("File not found:Error"))
             }
         }.subscribeOn(Schedulers.io()).subscribe(
             {
@@ -61,6 +61,7 @@ class PicturesPresenter(private val router: Router): MvpPresenter<PicturesView>(
 
     fun convertToPngAndSave(bitmapImage: Bitmap,contentResolver: ContentResolver){
         viewState.showProgress()
+
         disposableSaveImage = Completable.create{ emitter ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     val res = saveImageInQ(bitmapImage,contentResolver)
@@ -126,7 +127,7 @@ class PicturesPresenter(private val router: Router): MvpPresenter<PicturesView>(
         try {
             val directory =
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-            val file = File(directory, "SomeName")//"$fileName.png")
+            val file = File(directory, "$fileName.png")
             val outStream = FileOutputStream(file)
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream)
             outStream.flush()
@@ -150,6 +151,16 @@ class PicturesPresenter(private val router: Router): MvpPresenter<PicturesView>(
             e.printStackTrace()
             return false
         }
+    }
+
+    private fun saveUri(uri: Uri?){
+        val sharedPrefer =
+            App.instance.getSharedPreferences(PREF_SAVE_IMAGE, Context.MODE_PRIVATE)
+        val editor = sharedPrefer.edit()
+        editor.putString(
+            IMAGE_FILE_NAME,
+            uri.toString()
+        ).apply()
     }
 
     fun backPressed(): Boolean {

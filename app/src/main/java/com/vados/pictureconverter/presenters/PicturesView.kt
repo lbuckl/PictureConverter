@@ -1,7 +1,6 @@
 package com.vados.pictureconverter.presenters
 
 import android.net.Uri
-import androidx.activity.result.ActivityResultLauncher
 import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.StateStrategyType
