@@ -49,12 +49,14 @@ class PicturesFragment:
     }
 
     override val converter = PictureConverter()
-    override val imageName = "DefaultName"
 
     //Коллбэк от активити получающей фото из галереи
     override var launcher = registerForActivityResult(PictureRequest()){ uri ->
         uri?.let {
             showProgress()
+
+            val imageName = uri.toString().split("/").last()
+
             Completable.create{ emitter ->
                 try {
                     saveUri(uri)
@@ -75,7 +77,8 @@ class PicturesFragment:
                     showError("Ошибка загрузки изображения")
                 }
             )
-            presenter.showImage()
+
+            presenter.showImage(imageName)
         }
     }
 
@@ -145,6 +148,7 @@ class PicturesFragment:
      * Функция отображения информации об ошибке для пользователя
      */
     override fun showError(message: String) {
+        hideProgress()
         Toast.makeText(requireContext(),"Error: $message",Toast.LENGTH_SHORT).show()
     }
 
@@ -152,6 +156,7 @@ class PicturesFragment:
      * Функция отображения информационного сообщения для пользователя
      */
     override fun showInfo(message: String) {
+        hideProgress()
         Toast.makeText(requireContext(),message,Toast.LENGTH_LONG).show()
     }
 
@@ -211,7 +216,7 @@ class PicturesFragment:
     override fun backPressed() = presenter.backPressed()
 
 
-    override fun convertToPngAndSave() {
+    override fun convertToPngAndSave(imageName: String) {
         Completable.create{ emitter ->
             if (converter.convertToPngAndSave(
                     binding.imageView.drawable.toBitmap(),

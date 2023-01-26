@@ -25,5 +25,5 @@ interface PicturesView:MvpView {
     //Функция скрытия прогресс бара
     fun hideProgress()
 
-    fun convertToPngAndSave()
+    fun convertToPngAndSave(imageName: String)
 }

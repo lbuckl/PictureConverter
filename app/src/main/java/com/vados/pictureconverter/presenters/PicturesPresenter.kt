@@ -16,6 +16,8 @@ class PicturesPresenter(
     private  lateinit var disposableChooseImage: Disposable
     private  lateinit var disposableSaveImage: Disposable
 
+    private var pictureName = ""
+
 
     /**
      * Первое действие при запуске приложения
@@ -28,13 +30,20 @@ class PicturesPresenter(
     /**
      * Функция отображения фото по запрошенному uri
      */
-    fun showImage(){
-        viewState.displayImage()
+    fun showImage(imageName: String){
+        pictureName = imageName
+
+        if (pictureName == ""){
+            viewState.showError("Ошибка: Картинка не выбрана")
+        }
+        else viewState.displayImage()
     }
 
     fun convertAndSaveImage(){
         setLoadingState()
-        viewState.convertToPngAndSave()
+
+        if (pictureName == "") viewState.showError("Ошибка: Картинка не выбрана")
+        else viewState.convertToPngAndSave(pictureName)
     }
 
     private fun setLoadingState(){

@@ -6,5 +6,4 @@ import androidx.activity.result.ActivityResultLauncher
 
 interface IConvertAndSaveImage {
     val converter: PictureConverter
-    val imageName: String
 }
