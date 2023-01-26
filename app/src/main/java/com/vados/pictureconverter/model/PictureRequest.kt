@@ -19,7 +19,6 @@ class PictureRequest: ActivityResultContract<Int, Uri?>() {
      * @param input - произволный айди для интента
      */
     override fun createIntent(context: Context, input: Int): Intent {
-        Log.v("@@@",Thread.currentThread().name)
         //Вызываем стандартную галерею для выбора изображения с помощью Intent.ACTION_PICK:
         val intent = Intent(Intent.ACTION_PICK)
         //Тип получаемых объектов - image:

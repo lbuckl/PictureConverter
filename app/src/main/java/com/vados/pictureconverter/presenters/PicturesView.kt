@@ -19,7 +19,11 @@ interface PicturesView:MvpView {
     //Функция отображения иформационного сообщения
     fun showInfo(message: String)
     //Функция отображения фото
-    fun displayImage(uri: Uri?)
+    fun displayImage()
     //Функция отображения прогресс бара
     fun showProgress()
+    //Функция скрытия прогресс бара
+    fun hideProgress()
+
+    fun convertToPngAndSave()
 }
